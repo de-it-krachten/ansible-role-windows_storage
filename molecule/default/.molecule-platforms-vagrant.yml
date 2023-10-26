@@ -1,0 +1,112 @@
+---
+
+- name: centos7
+  ci: false
+  box: generic/centos7
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp', 'auto_config': True}]
+- name: centos8
+  ci: false
+  box: generic/centos8
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp', 'auto_config': True}]
+- name: centos8s
+  ci: false
+  box: generic/centos8s
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp', 'auto_config': True}]
+- name: centos9s
+  ci: false
+  box: generic/centos9s
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp', 'auto_config': True}]
+- name: rockylinux8
+  ci: false
+  box: generic/rocky8
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp', 'auto_config': True}]
+- name: rockylinux9
+  ci: false
+  box: generic/rocky9
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp', 'auto_config': True}]
+- name: oraclelinux8
+  ci: false
+  box: generic/oracle8
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp', 'auto_config': True}]
+- name: oraclelinux9
+  ci: false
+  box: generic/oracle9
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp', 'auto_config': True}]
+- name: almalinux8
+  ci: false
+  box: generic/alma8
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp', 'auto_config': True}]
+- name: almalinux9
+  ci: false
+  box: generic/alma9
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp', 'auto_config': True}]
+- name: opensuse15
+  ci: false
+  box: generic/opensuse15
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp', 'auto_config': True}]
+- name: opensusetumbleweed15
+  ci: false
+  box: generic/opensuse15
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp', 'auto_config': True}]
+- name: debian10
+  ci: false
+  box: generic/debian10
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp', 'auto_config': True}]
+- name: debian11
+  ci: false
+  box: generic/debian11
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp', 'auto_config': True}]
+- name: debian12
+  ci: false
+  box: debian/bookworm64
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp', 'auto_config': True}]
+- name: ubuntu1804
+  ci: false
+  box: generic/ubuntu1804
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp', 'auto_config': True}]
+- name: ubuntu2004
+  ci: false
+  box: generic/ubuntu2004
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp', 'auto_config': True}]
+- name: ubuntu2204
+  ci: false
+  box: generic/ubuntu2204
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
+- name: fedora37
+  ci: false
+  box: generic/fedora37
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
+- name: fedora38
+  ci: false
+  box: generic/fedora38
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
+- name: alpine3
+  ci: false
+  box: generic/alpine312
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
+- name: win2012r2
+  ci: false
+  box: peru/windows-server-2012_r2-standard-x64-eval
+  groups: ['windows']
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
+  provider_options: {'linked_clone': True}
+  provider_raw_config_args: ["customize [ 'modifyvm', :id, '--natdnshostresolver1', 'on' ]", "customize [ 'modifyvm', :id, '--natpf1', 'winrm,tcp,127.0.0.1,55985,,5985' ]"]
+- name: win2016
+  ci: false
+  box: peru/windows-server-2016-standard-x64-eval
+  groups: ['windows']
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
+- name: win2019
+  ci: false
+  box: peru/windows-server-2019-standard-x64-eval
+  groups: ['windows']
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
+  provider_options: {'linked_clone': True}
+  provider_raw_config_args: ["customize [ 'modifyvm', :id, '--natdnshostresolver1', 'on' ]", "customize [ 'modifyvm', :id, '--natpf1', 'winrm,tcp,127.0.0.1,55985,,5985' ]"]
+- name: win2022
+  ci: false
+  box: peru/windows-server-2022-standard-x64-eval
+  groups: ['windows']
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
+  provider_options: {'linked_clone': True}
+  provider_raw_config_args: ["customize [ 'modifyvm', :id, '--natdnshostresolver1', 'on' ]", "customize [ 'modifyvm', :id, '--natpf1', 'winrm,tcp,127.0.0.1,55985,,5985' ]"]

@@ -1,0 +1,144 @@
+---
+
+# Generic
+generic:
+  role: ansible-role-windows_storage
+  role_short: windows_storage
+  role_description: |
+    Initialize Windows storage (disk format)
+  collections: []
+
+# Supported platforms
+platforms:
+  rhel7:
+    ci: false
+    supported: false
+  rhel8:
+    ci: false
+    supported: false
+  rhel9:
+    ci: false
+    supported: false
+  centos7:
+    ci: false
+    supported: false
+  centos8:
+    ci: false
+    supported: false
+  centos8s:
+    ci: false
+    supported: false
+  centos9s:
+    ci: false
+    supported: false
+  rockylinux8:
+    ci: false
+    supported: false
+  rockylinux9:
+    ci: false
+    supported: false
+  oraclelinux8:
+    ci: false
+    supported: false
+  oraclelinux9:
+    ci: false
+    supported: false
+  almalinux8:
+    ci: false
+    supported: false
+  almalinux9:
+    ci: false
+    supported: false
+  opensuse15:
+    ci: false
+    supported: false
+  sles15:
+    ci: false
+    supported: false
+  debian10:
+    ci: false
+    supported: false
+  debian11:
+    ci: false
+    supported: false
+  debian12:
+    ci: false
+    supported: false
+  ubuntu1804:
+    ci: false
+    supported: false
+  ubuntu2004:
+    ci: false
+    supported: false
+  ubuntu2204:
+    ci: false
+    supported: false
+  fedora37:
+    ci: false
+    supported: false
+  fedora38:
+    ci: false
+    supported: false
+  alpine3:
+    ci: false
+    supported: false
+  win2012r2:
+    ci: false
+    supported: true
+  win2016:
+    ci: false
+    supported: true
+  win2019:
+    ci: false
+    supported: true
+  win2022:
+    ci: false
+    supported: true
+
+# Molecule
+molecule:
+  requirements:
+    roles_extra: []
+  host_vars:
+    windows-storage-{{ platform.name }}-node1:
+      ansible_shell_type: powershell
+      ansible_host: 127.0.0.1
+      ansible_port: 5985
+      ansible_connection: winrm
+      ansible_winrm_scheme: http
+      ansible_winrm_transport: basic
+      ansible_winrm_server_cert_validation: ignore
+      ansible_user: vagrant
+      ansible_password: vagrant
+      ansible_become_user: vagrant
+      ansible_become_method: runas
+  converge:
+    vars:
+      windows_storage:
+        disks:
+          - disk_number: 1
+          - disk_number: 2
+        partitions:
+          absent:
+            - disk_number: 1
+              partition_number: 1
+            - disk_number: 1
+              partition_number: 2
+            - disk_number: 2
+              partition_number: 1
+          present:
+            - disk_number: 1
+              drive_letter: X
+              file_system: ntfs
+              partition_number: 1
+              partition_size: 100 MiB
+            - disk_number: 1
+              drive_letter: Y
+              file_system: ntfs
+              partition_number: 2
+              partition_size: 200 MiB
+            - disk_number: 2
+              drive_letter: Z
+              file_system: ntfs
+              partition_number: 1
+              partition_size: -1
