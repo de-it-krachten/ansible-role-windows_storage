@@ -61,28 +61,14 @@ provisioner:
 {% endif %}
   env:
     ANSIBLE_PIPELINING: "True"
+    ANSIBLE_VERBOSITY: 0
   lint:
     name: ansible-lint
   playbooks:
     converge: ${MOLECULE_PLAYBOOK:-converge.yml}
   inventory:
-    group_vars: {}
-    host_vars:
-{% for platform in MOLECULE_DISTROS %}
-      windows-storage-{{ platform.name }}-node1:
-        ansible_become_method: runas
-        ansible_become_user: vagrant
-        ansible_connection: winrm
-        ansible_host: 127.0.0.1
-        ansible_password: vagrant
-        ansible_port: 5985
-        ansible_shell_type: powershell
-        ansible_user: vagrant
-        ansible_winrm_scheme: http
-        ansible_winrm_server_cert_validation: ignore
-        ansible_winrm_transport: basic
-
-{% endfor %}
+    group_vars: {"linux": {"ansible_user": "vagrant", "ansible_password": "vagrant"}, "windows": {"ansible_user": "vagrant", "ansible_password": "vagrant", "ansible_become_user": "vagrant", "ansible_become_method": "runas", "ansible_connection": "ssh", "ansible_shell_type": "cmd"}}
+    host_vars: {}
 scenario:
   name: default
 verifier:

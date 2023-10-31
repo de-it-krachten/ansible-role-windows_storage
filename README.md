@@ -3,7 +3,8 @@
 
 # ansible-role-windows_storage
 
-Initialize Windows storage (disk format)
+Initialize Windows storage (disk format)<br><br>
+Note that GPT disks have a reserved partition '1' after initialization<br>
 
 
 
@@ -13,17 +14,16 @@ Initialize Windows storage (disk format)
 None
 
 #### Collections
-- community.general
 - community.windows
 
 ## Platforms
 
 Supported platforms
 
-- Windows 2012 R2<sup>1</sup>
-- Windows 2016<sup>1</sup>
-- Windows 2019<sup>1</sup>
-- Windows 2022<sup>1</sup>
+- Windows Server 2012 R2<sup>1</sup>
+- Windows Server 2016<sup>1</sup>
+- Windows Server 2019<sup>1</sup>
+- Windows Server 2022<sup>1</sup>
 
 Note:
 <sup>1</sup> : no automated testing is performed on these platforms
@@ -31,7 +31,15 @@ Note:
 ## Role Variables
 ### defaults/main.yml
 <pre><code>
-windows_storage_list: []
+# Field mapping
+windows_storage_fields:
+  SATA:
+    adapter: SCSIPort
+    disk: SCSIBus
+  SAS:
+    adapter: SCSIPort
+    # disk: SCSILogicalUnit
+    disk: SCSITargetId
 </pre></code>
 
 
@@ -42,9 +50,33 @@ windows_storage_list: []
 <pre><code>
 - name: sample playbook for role 'windows_storage'
   hosts: all
-  become: "yes"
+  become: 'yes'
   vars:
-    windows_storage: {'disks': [{'disk_number': 1}, {'disk_number': 2}], 'partitions': {'absent': [{'disk_number': 1, 'partition_number': 1}, {'disk_number': 1, 'partition_number': 2}, {'disk_number': 2, 'partition_number': 1}], 'present': [{'disk_number': 1, 'drive_letter': 'X', 'file_system': 'ntfs', 'partition_number': 1, 'partition_size': '100 MiB'}, {'disk_number': 1, 'drive_letter': 'Y', 'file_system': 'ntfs', 'partition_number': 2, 'partition_size': '200 MiB'}, {'disk_number': 2, 'drive_letter': 'Z', 'file_system': 'ntfs', 'partition_number': 1, 'partition_size': -1}]}}
+    windows_storage_disk_layout:
+      - type: SATA
+        adapter: 0
+        disk: 1
+        style: gpt
+        partitions:
+          - drive_letter: X
+            file_system: ntfs
+            partition_number: 2
+            partition_size: 100 MiB
+          - drive_letter: Y
+            file_system: ntfs
+            partition_number: 3
+            partition_size: 200 MiB
+      - type: SATA
+        adapter: 0
+        disk: 2
+        style: mbr
+        partitions:
+          - drive_letter: Z
+            file_system: ntfs
+            partition_number: 1
+            partition_size: -1
+  roles:
+    - deitkrachten.facts
   tasks:
     - name: Include role 'windows_storage'
       ansible.builtin.include_role:

@@ -5,7 +5,8 @@ generic:
   role: ansible-role-windows_storage
   role_short: windows_storage
   role_description: |
-    Initialize Windows storage (disk format)
+    Initialize Windows storage (disk format)<br><br>
+    Note that GPT disks have a reserved partition '1' after initialization<br>
   collections: []
 
 # Supported platforms
@@ -85,60 +86,69 @@ platforms:
   win2012r2:
     ci: false
     supported: true
+    molecule:
+      vagrant:
+        instance_raw_config_args:
+          - "vm.disk :disk, name: \"disk1\", size: \"1GB\""
+          - "vm.disk :disk, name: \"disk2\", size: \"2GB\""
   win2016:
     ci: false
     supported: true
+    molecule:
+      vagrant:
+        instance_raw_config_args:
+          - "vm.disk :disk, name: \"disk1\", size: \"1GB\""
+          - "vm.disk :disk, name: \"disk2\", size: \"2GB\""
   win2019:
     ci: false
     supported: true
+    molecule:
+      vagrant:
+        instance_raw_config_args:
+          - "vm.disk :disk, name: \"disk1\", size: \"1GB\""
+          - "vm.disk :disk, name: \"disk2\", size: \"2GB\""
   win2022:
     ci: false
     supported: true
+    molecule:
+      vagrant:
+        instance_raw_config_args:
+          - "vm.disk :disk, name: \"disk1\", size: \"1GB\""
+          - "vm.disk :disk, name: \"disk2\", size: \"2GB\""
 
 # Molecule
 molecule:
+  driver: vagrant
+  provider: virtualbox
   requirements:
     roles_extra: []
-  host_vars:
-    windows-storage-{{ platform.name }}-node1:
-      ansible_shell_type: powershell
-      ansible_host: 127.0.0.1
-      ansible_port: 5985
-      ansible_connection: winrm
-      ansible_winrm_scheme: http
-      ansible_winrm_transport: basic
-      ansible_winrm_server_cert_validation: ignore
-      ansible_user: vagrant
-      ansible_password: vagrant
-      ansible_become_user: vagrant
-      ansible_become_method: runas
-  converge:
+  prepare:
     vars:
-      windows_storage:
-        disks:
-          - disk_number: 1
-          - disk_number: 2
-        partitions:
-          absent:
-            - disk_number: 1
-              partition_number: 1
-            - disk_number: 1
-              partition_number: 2
-            - disk_number: 2
-              partition_number: 1
-          present:
-            - disk_number: 1
-              drive_letter: X
+      auto_logon: true
+  converge:
+    roles:
+      - deitkrachten.facts
+    vars:
+      windows_storage_disk_layout:
+        - type: SATA
+          adapter: 0
+          disk: 1
+          style: gpt
+          partitions:
+            - drive_letter: X
               file_system: ntfs
-              partition_number: 1
+              partition_number: 2
               partition_size: 100 MiB
-            - disk_number: 1
-              drive_letter: Y
+            - drive_letter: Y
               file_system: ntfs
-              partition_number: 2
+              partition_number: 3
               partition_size: 200 MiB
-            - disk_number: 2
-              drive_letter: Z
+        - type: SATA
+          adapter: 0
+          disk: 2
+          style: mbr
+          partitions:
+            - drive_letter: Z
               file_system: ntfs
               partition_number: 1
               partition_size: -1
