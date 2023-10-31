@@ -86,27 +86,25 @@
   interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
 - name: win2012r2
   ci: false
-  box: peru/windows-server-2012_r2-standard-x64-eval
+  box: jborean93/WindowsServer2012R2
   groups: ['windows']
   interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
-  provider_options: {'linked_clone': True}
-  provider_raw_config_args: ["customize [ 'modifyvm', :id, '--natdnshostresolver1', 'on' ]", "customize [ 'modifyvm', :id, '--natpf1', 'winrm,tcp,127.0.0.1,55985,,5985' ]"]
+  instance_raw_config_args: ['vm.disk :disk, name: "disk1", size: "1GB"', 'vm.disk :disk, name: "disk2", size: "2GB"']
 - name: win2016
   ci: false
-  box: peru/windows-server-2016-standard-x64-eval
+  box: jborean93/WindowsServer2016
   groups: ['windows']
   interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
+  instance_raw_config_args: ['vm.disk :disk, name: "disk1", size: "1GB"', 'vm.disk :disk, name: "disk2", size: "2GB"']
 - name: win2019
   ci: false
-  box: peru/windows-server-2019-standard-x64-eval
+  box: jborean93/WindowsServer2019
   groups: ['windows']
   interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
-  provider_options: {'linked_clone': True}
-  provider_raw_config_args: ["customize [ 'modifyvm', :id, '--natdnshostresolver1', 'on' ]", "customize [ 'modifyvm', :id, '--natpf1', 'winrm,tcp,127.0.0.1,55985,,5985' ]"]
+  instance_raw_config_args: ['vm.disk :disk, name: "disk1", size: "1GB"', 'vm.disk :disk, name: "disk2", size: "2GB"']
 - name: win2022
   ci: false
-  box: peru/windows-server-2022-standard-x64-eval
+  box: jborean93/WindowsServer2022
   groups: ['windows']
   interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
-  provider_options: {'linked_clone': True}
-  provider_raw_config_args: ["customize [ 'modifyvm', :id, '--natdnshostresolver1', 'on' ]", "customize [ 'modifyvm', :id, '--natpf1', 'winrm,tcp,127.0.0.1,55985,,5985' ]"]
+  instance_raw_config_args: ['vm.disk :disk, name: "disk1", size: "1GB"', 'vm.disk :disk, name: "disk2", size: "2GB"']

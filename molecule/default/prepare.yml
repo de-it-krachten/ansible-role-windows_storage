@@ -44,6 +44,7 @@
       - opensuse15
 
     systemctl_alternative: False
+    auto_logon: True
   roles:
     - { role: deitkrachten.facts, when: ansible_os_family != 'Windows' }
     - deitkrachten.showinfo
@@ -83,6 +84,8 @@
           update_all: "{{ update_all | default(False) }}"
           activate_epel: "{{ activate_epel | default(False) }}"
           install_python: "{{ install_python | default(False) }}"
+          auto_logon: "{{ auto_logon | default(False) }}"
+          set_hostname: "{{ set_hostname | default(False) }}"
 
     - name: Enable root access
       when:
@@ -105,6 +108,29 @@
             user: root
             state: present
             key: "{{ root_pubkey }}"
+
+    - name: Generic (Windows)
+      when:
+        - ansible_os_family == 'Windows'
+      block:
+
+        - name: Set autologin for vagrant
+          community.windows.win_auto_logon:
+            username: vagrant
+            password: vagrant
+          register: _win_autologin
+          when: auto_logon is defined and auto_logon | bool
+
+        - name: Set the hostname
+          ansible.windows.win_hostname:
+            name: "{{ inventory_hostname }}"
+          when: set_hostname is defined and set_hostname | bool
+          register: _win_hostname
+
+        - name: Reboot
+          ansible.windows.win_reboot:
+          when: _win_hostname.changed or _win_autologin.changed
+
 
     - name: Generic (Linux)
       when:

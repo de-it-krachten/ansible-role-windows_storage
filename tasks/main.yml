@@ -1,34 +1,55 @@
 ---
 
-- name: Initialize Windows disks
-  community.windows.win_initialize_disk:
-    disk_number: "{{ item.disk_number }}"
-    force: "{{ item.force | default(omit) }}"
-  loop: "{{ windows_storage['disks'] }}"
+- name: Show settings for debugging
+  ansible.builtin.debug:
+    msg:
+      ansible_disks_custom: "{{ vars['ansible_disks_custom'] }}"
+      windows_storage_disk_layout: "{{ vars['windows_storage_disk_layout'] }}"
+    verbosity: 1
 
-- name: Cleanup undesired partitions
-  community.windows.win_partition:
-    disk_number: "{{ item.disk_number }}"
-    partition_number: "{{ item.partition_number }}"
-    state: absent
-  loop: "{{ windows_storage['partitions']['absent'] }}"
+- name: Convert list of disks
+  ansible.builtin.set_fact:
+    __windows_storage_layout: >-
+      [
+        {% for item in windows_storage_disk_layout %}
+        {% if item.disk_number is undefined and ansible_disks_custom is defined %}
+        {% set type = item.type %}
+        {% set adapter = item.adapter | string %}
+        {% set disk = item.disk | string %}
+        {% set adapter_field = windows_storage_fields[type]['adapter'] %}
+        {% set disk_field = windows_storage_fields[type]['disk'] %}
+        {% if type == 'SATA' %}
+        {% set q1 = "[?BusType=='" + type + "' && " + adapter_field + "==`" + adapter + "` && " + disk_field + "==`" + disk + "`].DeviceId" %}
+        {% elif type == 'SAS' %}
+        {% set q1 = "[?BusType=='" + type + "' && " + adapter_field + "==`" + adapter + "` && " + disk_field + "==`" + disk + "`].DeviceId" %}
+        {% endif %}
+        {% set disk_number = ansible_disks_custom.disks | json_query(q1) | first | int %}
+        {% set item = item | combine({"disk_number": disk_number}) %}
+        {% endif %}
+        {{ item }}{% if not loop.last %},{% endif %}
+        {% endfor %}
+      ]
+
+- name: Show settings for debugging
+  ansible.builtin.debug:
+    msg:
+      ansible_disks_custom: "{{ vars['__windows_storage_layout'] }}"
+    verbosity: 1
+
+- name: Change the drive letter of the CD/DVD
+  ansible.builtin.include_tasks:
+    file: dvd.yml
+
+- name: Partition each disk
+  ansible.builtin.include_tasks:
+    file: disk.yml
+  vars:
+    disk_number: "{{ disk.disk_number }}"
+    disk_partitions: "{{ disk.partitions }}"
+    disk_style: "{{ disk.style | default('gpt') }}"
+    disk_force: "{{ disk.force | default(False) }}"
+    disk_identifier: "{{ disk.type }}/{{ disk.adapter }}/{{ disk.disk }}"
+  loop: "{{ __windows_storage_layout }}"
   loop_control:
-    label: "disk {{ item.disk_number }} / partition {{ item.partition_number }}"
-
-- name: Create partitions on disk
-  community.windows.win_partition:
-    disk_number: "{{ item.disk_number }}"
-    drive_letter: "{{ item.drive_letter }}"
-    partition_number: "{{ item.partition_number | default(omit) }}"
-    partition_size: "{{ item.partition_size | default('-1') }}"
-    state: present
-  loop: "{{ windows_storage['partitions']['present'] }}"
-  loop_control:
-    label: "disk {{ item.disk_number }} / partition {{ item.partition_number }}"
-
-- name: Format Windows disks
-  community.windows.win_format:
-    drive_letter: "{{ item.drive_letter }}"
-    file_system: "{{ item.file_system | default('ntfs') }}"
-    full: "{{ item.full | default(omit) }}"
-  loop: "{{ windows_storage['partitions']['present'] }}"
+    loop_var: disk
+    label: "{{ disk_identifier }}"
