@@ -1,0 +1,11 @@
+---
+
+# Field mapping
+windows_storage_fields:
+  SATA:
+    adapter: SCSIPort
+    disk: SCSIBus
+  SAS:
+    adapter: SCSIPort
+    # disk: SCSILogicalUnit
+    disk: SCSITargetId

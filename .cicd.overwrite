@@ -1,0 +1,158 @@
+---
+
+# Generic
+generic:
+  role: ansible-role-windows_storage
+  role_short: windows_storage
+  role_description: |
+    Initialize Windows storage (disk format)<br><br>
+    Note that GPT disks have a reserved partition '1' after initialization<br>
+  collections: []
+
+# Supported platforms
+platforms:
+  rhel7:
+    ci: false
+    supported: false
+  rhel8:
+    ci: false
+    supported: false
+  rhel9:
+    ci: false
+    supported: false
+  centos7:
+    ci: false
+    supported: false
+  centos8:
+    ci: false
+    supported: false
+  centos8s:
+    ci: false
+    supported: false
+  centos9s:
+    ci: false
+    supported: false
+  rockylinux8:
+    ci: false
+    supported: false
+  rockylinux9:
+    ci: false
+    supported: false
+  oraclelinux8:
+    ci: false
+    supported: false
+  oraclelinux9:
+    ci: false
+    supported: false
+  almalinux8:
+    ci: false
+    supported: false
+  almalinux9:
+    ci: false
+    supported: false
+  opensuse15:
+    ci: false
+    supported: false
+  sles15:
+    ci: false
+    supported: false
+  debian10:
+    ci: false
+    supported: false
+  debian11:
+    ci: false
+    supported: false
+  debian12:
+    ci: false
+    supported: false
+  ubuntu1804:
+    ci: false
+    supported: false
+  ubuntu2004:
+    ci: false
+    supported: false
+  ubuntu2204:
+    ci: false
+    supported: false
+  fedora37:
+    ci: false
+    supported: false
+  fedora38:
+    ci: false
+    supported: false
+  alpine3:
+    ci: false
+    supported: false
+  win2012r2:
+    ci: false
+    supported: true
+    molecule:
+      vagrant:
+        instance_raw_config_args:
+          - "vm.disk :disk, name: \"disk1\", size: \"1GB\""
+          - "vm.disk :disk, name: \"disk2\", size: \"2GB\""
+  win2016:
+    ci: false
+    supported: true
+    molecule:
+      vagrant:
+        instance_raw_config_args:
+          - "vm.disk :disk, name: \"disk1\", size: \"1GB\""
+          - "vm.disk :disk, name: \"disk2\", size: \"2GB\""
+  win2019:
+    ci: false
+    supported: true
+    molecule:
+      vagrant:
+        instance_raw_config_args:
+          - "vm.disk :disk, name: \"disk1\", size: \"1GB\""
+          - "vm.disk :disk, name: \"disk2\", size: \"2GB\""
+  win2022:
+    ci: false
+    supported: true
+    molecule:
+      vagrant:
+        instance_raw_config_args:
+          - "vm.disk :disk, name: \"disk1\", size: \"1GB\""
+          - "vm.disk :disk, name: \"disk2\", size: \"2GB\""
+
+# Molecule
+molecule:
+  driver: vagrant
+  provider: virtualbox
+  requirements:
+    roles_extra: []
+  prepare:
+    vars:
+      auto_logon: true
+  converge:
+    roles:
+      - deitkrachten.facts
+    vars:
+      windows_storage_disk_layout:
+        - type: SATA
+          adapter: 0
+          disk: 1
+          style: gpt
+          partitions:
+            - drive_letter: X
+              file_system: ntfs
+              partition_number: 2
+              partition_size: 100 MiB
+            - drive_letter: Y
+              file_system: ntfs
+              partition_number: 3
+              partition_size: 200 MiB
+        - type: SATA
+          adapter: 0
+          disk: 2
+          style: mbr
+          partitions:
+            - drive_letter: Z
+              file_system: ntfs
+              partition_number: 1
+              partition_size: -1
+
+# Github
+github:
+  molecule: false
