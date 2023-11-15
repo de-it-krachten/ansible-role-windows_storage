@@ -62,10 +62,12 @@ windows_storage_fields:
             file_system: ntfs
             partition_number: 2
             partition_size: 100 MiB
+            allocation_unit_size: 8192
           - drive_letter: Y
             file_system: ntfs
             partition_number: 3
             partition_size: 200 MiB
+            compress: true
       - type: SATA
         adapter: 0
         disk: 2
@@ -75,6 +77,7 @@ windows_storage_fields:
             file_system: ntfs
             partition_number: 1
             partition_size: -1
+            label: myfulldisk
   roles:
     - deitkrachten.facts
   tasks:

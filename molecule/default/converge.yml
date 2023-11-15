@@ -4,7 +4,7 @@
   hosts: all
   become: "yes"
   vars:
-    windows_storage_disk_layout: [{'type': 'SATA', 'adapter': 0, 'disk': 1, 'style': 'gpt', 'partitions': [{'drive_letter': 'X', 'file_system': 'ntfs', 'partition_number': 2, 'partition_size': '100 MiB'}, {'drive_letter': 'Y', 'file_system': 'ntfs', 'partition_number': 3, 'partition_size': '200 MiB'}]}, {'type': 'SATA', 'adapter': 0, 'disk': 2, 'style': 'mbr', 'partitions': [{'drive_letter': 'Z', 'file_system': 'ntfs', 'partition_number': 1, 'partition_size': -1}]}]
+    windows_storage_disk_layout: [{'type': 'SATA', 'adapter': 0, 'disk': 1, 'style': 'gpt', 'partitions': [{'drive_letter': 'X', 'file_system': 'ntfs', 'partition_number': 2, 'partition_size': '100 MiB', 'allocation_unit_size': 8192}, {'drive_letter': 'Y', 'file_system': 'ntfs', 'partition_number': 3, 'partition_size': '200 MiB', 'compress': True}]}, {'type': 'SATA', 'adapter': 0, 'disk': 2, 'style': 'mbr', 'partitions': [{'drive_letter': 'Z', 'file_system': 'ntfs', 'partition_number': 1, 'partition_size': -1, 'label': 'myfulldisk'}]}]
   roles:
     - deitkrachten.facts
   tasks:
