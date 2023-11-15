@@ -26,7 +26,12 @@
 
 - name: Format Windows disks '{{ disk_number }}'
   community.windows.win_format:
+    allocation_unit_size: "{{ item.allocation_unit_size | int | default(omit) }}"
+    compress: "{{ item.compress | default(omit) }}"
     drive_letter: "{{ item.drive_letter }}"
     file_system: "{{ item.file_system | default('ntfs') }}"
     full: "{{ item.full | default(omit) }}"
+    label: "{{ item.label | default(omit) }}"
+    large_frs: "{{ item.large_frs | default(omit) }}"
   loop: "{{ disk_partitions | default([]) }}"
+  when: item.state is undefined or item.state == 'present'
