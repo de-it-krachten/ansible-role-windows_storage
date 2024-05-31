@@ -20,6 +20,7 @@ None
 
 Supported platforms
 
+- Ubuntu 24.04 LTS
 - Windows Server 2012 R2<sup>1</sup>
 - Windows Server 2016<sup>1</sup>
 - Windows Server 2019<sup>1</sup>
