@@ -9,30 +9,36 @@
 - name: Cleanup undesired partitions for disk '{{ disk_number }}'
   community.windows.win_partition:
     disk_number: "{{ disk_number }}"
-    partition_number: "{{ item.partition_number }}"
+    partition_number: "{{ part.partition_number }}"
     state: absent
   loop: "{{ disk_partitions | default([]) }}"
-  when: item.state is defined and item.state == 'absent'
+  loop_control:
+    loop_var: part
+  when: part.state is defined and part.state == 'absent'
 
 - name: Create partitions on disk '{{ disk_number }}'
   community.windows.win_partition:
     disk_number: "{{ disk_number }}"
-    drive_letter: "{{ item.drive_letter }}"
-    partition_number: "{{ item.partition_number | default(omit) }}"
-    partition_size: "{{ item.partition_size | default('-1') }}"
+    drive_letter: "{{ part.drive_letter }}"
+    partition_number: "{{ part.partition_number | default(omit) }}"
+    partition_size: "{{ part.partition_size | default('-1') }}"
     state: present
   loop: "{{ disk_partitions | default([]) }}"
-  when: item.state is undefined or item.state == 'present'
+  loop_control:
+    loop_var: part
+  when: part.state is undefined or part.state == 'present'
 
 - name: Format Windows disks '{{ disk_number }}'
   community.windows.win_format:
-    allocation_unit_size: "{{ item.allocation_unit_size | default(omit) }}"
-    compress: "{{ item.compress | default(omit) }}"
-    drive_letter: "{{ item.drive_letter }}"
-    file_system: "{{ item.file_system | default('ntfs') }}"
-    force: "{{ item.force | default(omit) }}"
-    full: "{{ item.full | default(omit) }}"
-    large_frs: "{{ item.large_frs | default(omit) }}"
-    new_label: "{{ item.label | default(omit) }}"
+    allocation_unit_size: "{{ part.allocation_unit_size | default(omit) }}"
+    compress: "{{ part.compress | default(omit) }}"
+    drive_letter: "{{ part.drive_letter }}"
+    file_system: "{{ part.file_system | default('ntfs') }}"
+    force: "{{ part.force | default(omit) }}"
+    full: "{{ part.full | default(omit) }}"
+    large_frs: "{{ part.large_frs | default(omit) }}"
+    new_label: "{{ part.label | default(omit) }}"
   loop: "{{ disk_partitions | default([]) }}"
-  when: item.state is undefined or item.state == 'present'
+  loop_control:
+    loop_var: part
+  when: part.state is undefined or part.state == 'present'
