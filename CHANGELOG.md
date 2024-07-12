@@ -1,3 +1,15 @@
+# [1.3.0](https://github.com/de-it-krachten/ansible-role-windows_storage/compare/v1.2.0...v1.3.0) (2024-07-12)
+
+
+### Bug Fixes
+
+* Fix duplicate loop var ([9c15e71](https://github.com/de-it-krachten/ansible-role-windows_storage/commit/9c15e715e50be19a5b4f364c36112346a4f24d8b))
+
+
+### Features
+
+* Add support for forced reformatting ([5ede9ba](https://github.com/de-it-krachten/ansible-role-windows_storage/commit/5ede9badb6dc73b208e4024417979aebff6476c8))
+
 # [1.2.0](https://github.com/de-it-krachten/ansible-role-windows_storage/compare/v1.1.0...v1.2.0) (2024-06-03)
 
 
