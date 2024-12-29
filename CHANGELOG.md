@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/de-it-krachten/ansible-role-windows_storage/compare/v1.3.0...v1.4.0) (2024-12-29)
+
+
+### Features
+
+* Update supported platforms & CI ([8f1186b](https://github.com/de-it-krachten/ansible-role-windows_storage/commit/8f1186ba46aa47fe140308d10598d7da2fc64dd2))
+
 # [1.3.0](https://github.com/de-it-krachten/ansible-role-windows_storage/compare/v1.2.0...v1.3.0) (2024-07-12)
 
 
