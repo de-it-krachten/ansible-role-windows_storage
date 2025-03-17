@@ -3,6 +3,7 @@
 - name: Show settings for debugging
   ansible.builtin.debug:
     msg:
+      ansible_distribution: "{{ ansible_distribution }}"
       ansible_disks_custom: "{{ vars['ansible_disks_custom'] }}"
       windows_storage_disk_layout: "{{ vars['windows_storage_disk_layout'] }}"
     verbosity: 1
@@ -12,21 +13,23 @@
     __windows_storage_layout: >-
       [
         {% for item in windows_storage_disk_layout %}
-        {% if item.disk_number is undefined and ansible_disks_custom is defined %}
-        {% set type = item.type %}
-        {% set adapter = item.adapter | string %}
-        {% set disk = item.disk | string %}
-        {% set adapter_field = windows_storage_fields[type]['adapter'] %}
-        {% set disk_field = windows_storage_fields[type]['disk'] %}
-        {% if type == 'SATA' %}
-        {% set q1 = "[?BusType=='" + type + "' && " + adapter_field + "==`" + adapter + "` && " + disk_field + "==`" + disk + "`].DeviceId" %}
-        {% elif type == 'SAS' %}
-        {% set q1 = "[?BusType=='" + type + "' && " + adapter_field + "==`" + adapter + "` && " + disk_field + "==`" + disk + "`].DeviceId" %}
-        {% endif %}
-        {% set disk_number = ansible_disks_custom.disks | json_query(q1) | first | int %}
-        {% set item = item | combine({"disk_number": disk_number}) %}
-        {% endif %}
-        {{ item }}{% if not loop.last %},{% endif %}
+          {% if item.disk_number is undefined and ansible_disks_custom is defined %}
+
+            {% set type = item.type %}
+            {% set adapter = item.adapter | string %}
+            {% set disk = item.disk | string %}
+            {% set adapter_field = windows_storage_fields[type]['adapter'] %}
+            {% set disk_field = windows_storage_fields[type]['disk'] %}
+
+            {% set q1 = "[?BusType=='" + type + "' && " + adapter_field + "==`" + adapter + "` && " + disk_field + "==`" + disk + "`].DeviceId" %}
+
+            {% set disk_number = ansible_disks_custom.disks | json_query(q1) | first | int %}
+            {% set item = item | combine({"disk_number": disk_number}) %}
+
+          {% endif %}
+
+          {{ item }}{% if not loop.last %},{% endif %}
+
         {% endfor %}
       ]
 
