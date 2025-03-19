@@ -32,6 +32,9 @@ Note:
 ## Role Variables
 ### defaults/main.yml
 <pre><code>
+# Show extra information
+windows_storage_verbose: false
+
 # Field mapping
 windows_storage_fields:
   SATA:
@@ -39,8 +42,8 @@ windows_storage_fields:
     disk: SCSIBus
   SAS:
     adapter: SCSIPort
-    # disk: SCSILogicalUnit
-    disk: SCSITargetId
+    # disk: SCSILogicalUnit  # Azure VMs
+    disk: SCSITargetId       # Virtualbox VM's
 </pre></code>
 
 
