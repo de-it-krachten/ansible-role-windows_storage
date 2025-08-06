@@ -20,6 +20,9 @@ platforms:
   rhel9:
     ci: false
     supported: false
+  rhel10:
+    ci: false
+    supported: false
   centos7:
     ci: false
     supported: false
@@ -32,10 +35,16 @@ platforms:
   centos9s:
     ci: false
     supported: false
+  centos10s:
+    ci: false
+    supported: false
   rockylinux8:
     ci: false
     supported: false
   rockylinux9:
+    ci: false
+    supported: false
+  rockylinux10:
     ci: false
     supported: false
   oraclelinux8:
@@ -44,10 +53,16 @@ platforms:
   oraclelinux9:
     ci: false
     supported: false
+  oraclelinux10:
+    ci: false
+    supported: false
   almalinux8:
     ci: false
     supported: false
   almalinux9:
+    ci: false
+    supported: false
+  almalinux10:
     ci: false
     supported: false
   opensuse15:
@@ -65,6 +80,9 @@ platforms:
   debian12:
     ci: false
     supported: false
+  debian13:
+    ci: false
+    supported: false
   ubuntu1804:
     ci: false
     supported: false
@@ -74,10 +92,13 @@ platforms:
   ubuntu2204:
     ci: false
     supported: false
-  fedora40:
+  ubuntu2404:
     ci: false
     supported: false
   fedora41:
+    ci: false
+    supported: false
+  fedora42:
     ci: false
     supported: false
   alpine3:
@@ -108,6 +129,14 @@ platforms:
           - "vm.disk :disk, name: \"disk1\", size: \"1GB\""
           - "vm.disk :disk, name: \"disk2\", size: \"2GB\""
   win2022:
+    ci: false
+    supported: true
+    molecule:
+      vagrant:
+        instance_raw_config_args:
+          - "vm.disk :disk, name: \"disk1\", size: \"1GB\""
+          - "vm.disk :disk, name: \"disk2\", size: \"2GB\""
+  win2025:
     ci: false
     supported: true
     molecule:
