@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/de-it-krachten/ansible-role-windows_storage/compare/v1.4.0...v1.5.0) (2025-08-07)
+
+
+### Features
+
+* Add support for Windows Server 2025 ([1824653](https://github.com/de-it-krachten/ansible-role-windows_storage/commit/1824653614f1600d74e65af18e68f80853e2c4e8))
+
 # [1.4.0](https://github.com/de-it-krachten/ansible-role-windows_storage/compare/v1.3.0...v1.4.0) (2024-12-29)
 
 
