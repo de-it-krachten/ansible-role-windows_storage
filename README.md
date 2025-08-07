@@ -20,11 +20,11 @@ None
 
 Supported platforms
 
-- Ubuntu 24.04 LTS
 - Windows Server 2012 R2<sup>1</sup>
 - Windows Server 2016<sup>1</sup>
 - Windows Server 2019<sup>1</sup>
 - Windows Server 2022<sup>1</sup>
+- Windows Server 2025<sup>1</sup>
 
 Note:
 <sup>1</sup> : no automated testing is performed on these platforms
@@ -32,6 +32,9 @@ Note:
 ## Role Variables
 ### defaults/main.yml
 <pre><code>
+# Show extra information
+windows_storage_verbose: false
+
 # Field mapping
 windows_storage_fields:
   SATA:
@@ -39,8 +42,8 @@ windows_storage_fields:
     disk: SCSIBus
   SAS:
     adapter: SCSIPort
-    # disk: SCSILogicalUnit
-    disk: SCSITargetId
+    # disk: SCSILogicalUnit  # Azure VMs
+    disk: SCSITargetId       # Virtualbox VM's
 </pre></code>
 
 
