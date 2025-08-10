@@ -16,6 +16,37 @@
     loop_var: part
   when: part.state is defined and part.state == 'absent'
 
+- name: Check partition exists and has correct size
+  ansible.windows.win_powershell:
+    script: |
+      param(
+        [int]$DiskNumber = {{ disk_number }},
+        [int]$PartitionNumber = {{ partition_number }},
+        [Int64]$DesiredSizeGB = {{ desired_size_gb | default(-1) }}
+      )
+
+      # Convert GB to bytes unless -1 means "use max"
+      if ($DesiredSizeGB -ne -1) {
+        $DesiredSizeBytes = $DesiredSizeGB * 1GB
+      } else {
+        $DesiredSizeBytes = -1
+      }
+
+      $p = Get-Partition -DiskNumber $DiskNumber -PartitionNumber $PartitionNumber -ErrorAction SilentlyContinue
+      if (-not $p) { exit 2 }  # missing
+
+      # Size check
+      if ($DesiredSizeBytes -eq -1) {
+        # "Use max" mode: check if already at maximum supported size
+        $supp = Get-PartitionSupportedSize -DiskNumber $DiskNumber -PartitionNumber $PartitionNumber
+        if ($p.Size -ge ($supp.SizeMax - 1MB)) { exit 0 } else { exit 3 }
+      } else {
+        $tolerance = 1MB
+        if ([math]::Abs([int64]$p.Size - [int64]$DesiredSizeBytes) -le $tolerance) { exit 0 } else { exit 3 }
+      }
+  register: partition_check
+  failed_when: false
+
 - name: Create partitions on disk '{{ disk_number }}'
   community.windows.win_partition:
     disk_number: "{{ disk_number }}"
@@ -26,7 +57,9 @@
   loop: "{{ disk_partitions | default([]) }}"
   loop_control:
     loop_var: part
-  when: part.state is undefined or part.state == 'present'
+  when:
+    - part.state is undefined or part.state == 'present'
+    - partition_check.rc != 0
 
 - name: Format Windows disks '{{ disk_number }}'
   community.windows.win_format:
