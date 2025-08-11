@@ -6,6 +6,22 @@
     force: "{{ disk_force | default(False) }}"
     style: "{{ disk_style | default('gpt') }}"
 
+- name: Convert partition sizes into bytes  # noqa jinja[spacing]
+  ansible.builtin.set_fact:
+    __disk_partitions: >-
+      [
+        {%- for part in disk_partitions -%}
+          {%- if part.partition_size | lower is search('gib$|g$') -%}
+            {%- set ps = part.partition_size|lower|regex_replace('gib$|g$')|trim|int * 1024 * 1024 * 1024 -%}
+          {%- elif part.partition_size | lower is search('mib$|m$') -%}
+            {%- set ps = part.partition_size|lower|regex_replace('mib$|m$')|trim|int * 1024 * 1024 -%}
+          {%- else -%}
+            {%- set ps = -1 -%}
+          {%- endif -%}
+          {{ part | combine({"partition_size": ps}) }},
+        {%- endfor -%}
+      ]
+
 - name: Cleanup undesired partitions for disk '{{ disk_number }}'
   community.windows.win_partition:
     disk_number: "{{ disk_number }}"
@@ -17,49 +33,54 @@
   when: part.state is defined and part.state == 'absent'
 
 - name: Check partition exists and has correct size
-  ansible.windows.win_powershell:
-    script: |
-      param(
-        [int]$DiskNumber = {{ disk_number }},
-        [int]$PartitionNumber = {{ partition_number }},
-        [Int64]$DesiredSizeGB = {{ desired_size_gb | default(-1) }}
-      )
+  ansible.windows.win_shell: |
 
-      # Convert GB to bytes unless -1 means "use max"
-      if ($DesiredSizeGB -ne -1) {
-        $DesiredSizeBytes = $DesiredSizeGB * 1GB
-      } else {
-        $DesiredSizeBytes = -1
-      }
+    # rc=0 : partition present and correct in size
+    # rc=2 : partition not present
+    # rc=3 : partition present but too small
 
-      $p = Get-Partition -DiskNumber $DiskNumber -PartitionNumber $PartitionNumber -ErrorAction SilentlyContinue
-      if (-not $p) { exit 2 }  # missing
+    $DiskNumber = {{ disk_number }}
+    $PartitionNumber = {{ part.partition_number }}
+    $DesiredSize = {{ part.partition_size }}
 
-      # Size check
-      if ($DesiredSizeBytes -eq -1) {
-        # "Use max" mode: check if already at maximum supported size
-        $supp = Get-PartitionSupportedSize -DiskNumber $DiskNumber -PartitionNumber $PartitionNumber
-        if ($p.Size -ge ($supp.SizeMax - 1MB)) { exit 0 } else { exit 3 }
-      } else {
-        $tolerance = 1MB
-        if ([math]::Abs([int64]$p.Size - [int64]$DesiredSizeBytes) -le $tolerance) { exit 0 } else { exit 3 }
-      }
+    $p = Get-Partition -DiskNumber $DiskNumber -PartitionNumber $PartitionNumber -ErrorAction SilentlyContinue
+    if (-not $p) { exit 2 }  # missing
+
+    # Size check
+    if ($DesiredSize -eq -1) {
+      # "Use max" mode: check if already at maximum supported size
+      $supp = Get-PartitionSupportedSize -DiskNumber $DiskNumber -PartitionNumber $PartitionNumber
+      if ($p.Size -ge ($supp.SizeMax - 1MB)) { exit 0 } else { exit 3 }
+    } else {
+      $tolerance = 1MB
+      if ([math]::Abs([int64]$p.Size - [int64]$DesiredSize) -le $tolerance) { exit 0 } else { exit 3 }
+    }
   register: partition_check
-  failed_when: false
-
-- name: Create partitions on disk '{{ disk_number }}'
-  community.windows.win_partition:
-    disk_number: "{{ disk_number }}"
-    drive_letter: "{{ part.drive_letter }}"
-    partition_number: "{{ part.partition_number | default(omit) }}"
-    partition_size: "{{ part.partition_size | default('-1') }}"
-    state: present
-  loop: "{{ disk_partitions | default([]) }}"
+  failed_when: partition_check.rc > 3
+  changed_when: false
+  loop: "{{ __disk_partitions }}"
   loop_control:
     loop_var: part
+
+- name: Create partitions on disk '{{ disk_number }}'  # noqa jinja[spacing]
+  community.windows.win_partition:
+    disk_number: "{{ disk_number }}"
+    drive_letter: "{{ part.part.drive_letter }}"
+    partition_number: "{{ part.part.partition_number | default(omit) }}"
+    partition_size: >-
+      {%- if part.part.partition_size | default(-1) == -1 -%}
+      -1
+      {%- else -%}
+      {{ part.part.partition_size }} B
+      {%- endif -%}
+    state: present
+  loop: "{{ partition_check.results }}"
+  loop_control:
+    loop_var: part
+    label: "{{ part.part }}"
   when:
-    - part.state is undefined or part.state == 'present'
-    - partition_check.rc != 0
+    - part.part.state is undefined or part.part.state == 'present'
+    - part.rc != 0
 
 - name: Format Windows disks '{{ disk_number }}'
   community.windows.win_format:
