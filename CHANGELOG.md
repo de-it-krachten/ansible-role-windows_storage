@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/de-it-krachten/ansible-role-windows_storage/compare/v1.5.0...v1.5.1) (2025-08-11)
+
+
+### Bug Fixes
+
+* Add partition check to prevent unnecessary actions ([0fc1a14](https://github.com/de-it-krachten/ansible-role-windows_storage/commit/0fc1a144483de6be01b32b0ccbbe084852267a31))
+
 # [1.5.0](https://github.com/de-it-krachten/ansible-role-windows_storage/compare/v1.4.0...v1.5.0) (2025-08-07)
 
 
