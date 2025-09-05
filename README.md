@@ -14,6 +14,7 @@ Note that GPT disks have a reserved partition '1' after initialization<br>
 None
 
 #### Collections
+- ansible.windows
 - community.windows
 
 ## Platforms

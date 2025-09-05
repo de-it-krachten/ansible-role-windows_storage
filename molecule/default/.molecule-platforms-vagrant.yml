@@ -146,6 +146,7 @@
   ci: false
   box: jborean93/WindowsServer2022
   groups: ['windows']
+  interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
   instance_raw_config_args: ['vm.disk :disk, name: "disk1", size: "1GB"', 'vm.disk :disk, name: "disk2", size: "2GB"']
 - name: win2025
   ci: false
