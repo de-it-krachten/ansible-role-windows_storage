@@ -30,31 +30,43 @@
   loop: "{{ disk_partitions | default([]) }}"
   loop_control:
     loop_var: part
-  when: part.state is defined and part.state == 'absent'
+  when: (part.state | default('present')) == 'absent'
 
-- name: Check partition exists and has correct size
-  ansible.windows.win_shell: |
+- name: Distribute partion check script
+  ansible.windows.win_copy:
+    dest: '{{ ansible_env.TEMP }}\partion-check.ps1'
+    content: |
+      # rc=0 : partition present and correct in size
+      # rc=2 : partition not present
+      # rc=3 : partition present but too small
 
-    # rc=0 : partition present and correct in size
-    # rc=2 : partition not present
-    # rc=3 : partition present but too small
+      param(
+        [int]$DiskNumber,
+        [int]$PartitionNumber,
+        [int]$DesiredSize
+      )
 
-    $DiskNumber = {{ disk_number }}
-    $PartitionNumber = {{ part.partition_number }}
-    $DesiredSize = {{ part.partition_size }}
+      $p = Get-Partition -DiskNumber $DiskNumber -PartitionNumber $PartitionNumber -ErrorAction SilentlyContinue
+      if (-not $p) { exit 2 }  # missing
 
-    $p = Get-Partition -DiskNumber $DiskNumber -PartitionNumber $PartitionNumber -ErrorAction SilentlyContinue
-    if (-not $p) { exit 2 }  # missing
+      # Size check
+      if ($DesiredSize -eq -1) {
+        # "Use max" mode: check if already at maximum supported size
+        $supp = Get-PartitionSupportedSize -DiskNumber $DiskNumber -PartitionNumber $PartitionNumber
+        if ($p.Size -ge ($supp.SizeMax - 1MB)) { exit 0 } else { exit 3 }
+      } else {
+        $tolerance = 1MB
+        if ([math]::Abs([int64]$p.Size - [int64]$DesiredSize) -le $tolerance) { exit 0 } else { exit 3 }
+      }
 
-    # Size check
-    if ($DesiredSize -eq -1) {
-      # "Use max" mode: check if already at maximum supported size
-      $supp = Get-PartitionSupportedSize -DiskNumber $DiskNumber -PartitionNumber $PartitionNumber
-      if ($p.Size -ge ($supp.SizeMax - 1MB)) { exit 0 } else { exit 3 }
-    } else {
-      $tolerance = 1MB
-      if ([math]::Abs([int64]$p.Size - [int64]$DesiredSize) -le $tolerance) { exit 0 } else { exit 3 }
-    }
+- name: Execute partion check script
+  ansible.windows.win_shell: >-
+    PowerShell.exe
+    -ExecutionPolicy Bypass
+    -File "$env:TEMP\partion-check.ps1"
+    -DiskNumber {{ disk_number }}
+    -PartitionNumber {{ part.partition_number }}
+    -DesiredSize {{ part.partition_size }}
   register: partition_check
   failed_when: partition_check.rc > 3
   changed_when: false
@@ -79,7 +91,7 @@
     loop_var: part
     label: "{{ part.part }}"
   when:
-    - part.part.state is undefined or part.part.state == 'present'
+    - (part.part.state | default('present')) == 'present'
     - part.rc != 0
 
 - name: Format Windows disks '{{ disk_number }}'
@@ -95,4 +107,4 @@
   loop: "{{ disk_partitions | default([]) }}"
   loop_control:
     loop_var: part
-  when: part.state is undefined or part.state == 'present'
+  when: (part.state | default('present')) == 'present'
