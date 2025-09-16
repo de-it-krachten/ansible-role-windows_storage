@@ -22,6 +22,8 @@
         {%- endfor -%}
       ]
 
+- debug: var=__disk_partitions
+
 - name: Cleanup undesired partitions for disk '{{ disk_number }}'
   community.windows.win_partition:
     disk_number: "{{ disk_number }}"
