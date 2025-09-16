@@ -22,7 +22,10 @@
         {%- endfor -%}
       ]
 
-- debug: var=__disk_partitions
+- name: Show disk partitions
+  ansible.builtin.debug:
+    msg: "{{ __disk_partitions }}"
+    verbosity: "{{ 0 if windows_storage_verbose | bool else 1 }}"
 
 - name: Cleanup undesired partitions for disk '{{ disk_number }}'
   community.windows.win_partition:
@@ -36,30 +39,9 @@
 
 - name: Distribute partion check script
   ansible.windows.win_copy:
+    src: partion-check.ps1
     dest: '{{ ansible_env.TEMP }}\partion-check.ps1'
-    content: |
-      # rc=0 : partition present and correct in size
-      # rc=2 : partition not present
-      # rc=3 : partition present but too small
-
-      param(
-        [int]$DiskNumber,
-        [int]$PartitionNumber,
-        [int]$DesiredSize
-      )
-
-      $p = Get-Partition -DiskNumber $DiskNumber -PartitionNumber $PartitionNumber -ErrorAction SilentlyContinue
-      if (-not $p) { exit 2 }  # missing
-
-      # Size check
-      if ($DesiredSize -eq -1) {
-        # "Use max" mode: check if already at maximum supported size
-        $supp = Get-PartitionSupportedSize -DiskNumber $DiskNumber -PartitionNumber $PartitionNumber
-        if ($p.Size -ge ($supp.SizeMax - 1MB)) { exit 0 } else { exit 3 }
-      } else {
-        $tolerance = 1MB
-        if ([math]::Abs([int64]$p.Size - [int64]$DesiredSize) -le $tolerance) { exit 0 } else { exit 3 }
-      }
+  changed_when: false
 
 - name: Execute partion check script
   ansible.windows.win_shell: >-
