@@ -22,6 +22,8 @@
         {%- endfor -%}
       ]
 
+- debug: var=__disk_partitions
+
 - name: Show disk partitions
   ansible.builtin.debug:
     msg: "{{ __disk_partitions }}"
@@ -57,6 +59,10 @@
   loop: "{{ __disk_partitions }}"
   loop_control:
     loop_var: part
+
+- name: Change the drive letter
+  community.windows.win_partition:
+
 
 - name: Create partitions on disk '{{ disk_number }}'  # noqa jinja[spacing]
   community.windows.win_partition:
