@@ -37,7 +37,7 @@
   ansible.builtin.debug:
     msg:
       ansible_disks_custom: "{{ vars['__windows_storage_layout'] }}"
-    verbosity: 1
+    verbosity: "{{ 0 if windows_storage_verbose | bool else 1 }}"
 
 - name: Change the drive letter of the CD/DVD
   ansible.builtin.include_tasks:
@@ -51,7 +51,7 @@
       disk_style: "{{ disk.style | default('gpt') }}"
       disk_force: "{{ disk.force | default(False) }}"
       disk_identifier: "{{ disk.type }}/{{ disk.adapter }}/{{ disk.disk }}"
-    verbosity: 1
+    verbosity: "{{ 0 if windows_storage_verbose | bool else 1 }}"
   loop: "{{ __windows_storage_layout }}"
   loop_control:
     loop_var: disk

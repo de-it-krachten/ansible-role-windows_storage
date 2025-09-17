@@ -22,6 +22,11 @@
         {%- endfor -%}
       ]
 
+- name: Show disk partitions
+  ansible.builtin.debug:
+    msg: "{{ __disk_partitions }}"
+    verbosity: "{{ 0 if windows_storage_verbose | bool else 1 }}"
+
 - name: Cleanup undesired partitions for disk '{{ disk_number }}'
   community.windows.win_partition:
     disk_number: "{{ disk_number }}"
