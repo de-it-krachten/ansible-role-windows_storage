@@ -128,6 +128,8 @@ platforms:
         instance_raw_config_args:
           - "vm.disk :disk, name: \"disk1\", size: \"1GB\""
           - "vm.disk :disk, name: \"disk2\", size: \"2GB\""
+        interfaces: []
+
   win2022:
     ci: false
     supported: true
