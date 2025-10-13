@@ -39,7 +39,7 @@
 
 - name: Distribute partion check script
   ansible.windows.win_copy:
-    src: partion-check.ps1
+    src: 'files/partion-check.ps1'
     dest: '{{ ansible_env.TEMP }}\partion-check.ps1'
   changed_when: false
 
@@ -57,6 +57,19 @@
   loop: "{{ __disk_partitions }}"
   loop_control:
     loop_var: part
+
+- name: Change the drive letter
+  community.windows.win_partition:
+    disk_number: "{{ disk_number }}"
+    drive_letter: "{{ part.part.drive_letter }}"
+    partition_number: "{{ part.part.partition_number | default(omit) }}"
+  loop: "{{ partition_check.results }}"
+  loop_control:
+    loop_var: part
+    label: "{{ part.part }}"
+  when:
+    - (part.part.state | default('present')) == 'present'
+    - part.rc == 0
 
 - name: Create partitions on disk '{{ disk_number }}'  # noqa jinja[spacing]
   community.windows.win_partition:
