@@ -43,6 +43,19 @@
   ansible.builtin.include_tasks:
     file: dvd.yml
 
+- name: Show partition information
+  ansible.builtin.debug:
+    msg:
+      disk_number: "{{ disk.disk_number }}"
+      disk_partitions: "{{ disk.partitions }}"
+      disk_style: "{{ disk.style | default('gpt') }}"
+      disk_force: "{{ disk.force | default(False) }}"
+      disk_identifier: "{{ disk.type }}/{{ disk.adapter }}/{{ disk.disk }}"
+    verbosity: 1
+  loop: "{{ __windows_storage_layout }}"
+  loop_control:
+    loop_var: disk
+
 - name: Partition each disk
   ansible.builtin.include_tasks:
     file: disk.yml

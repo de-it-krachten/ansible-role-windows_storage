@@ -14,12 +14,14 @@ Note that GPT disks have a reserved partition '1' after initialization<br>
 None
 
 #### Collections
+- ansible.windows
 - community.windows
 
 ## Platforms
 
 Supported platforms
 
+- Fedora 43
 - Windows Server 2012 R2<sup>1</sup>
 - Windows Server 2016<sup>1</sup>
 - Windows Server 2019<sup>1</sup>
@@ -56,6 +58,7 @@ windows_storage_fields:
   hosts: all
   become: 'yes'
   vars:
+    molecule_driver: '{{ lookup(''env'', ''MOLECULE_DRIVER_NAME'') }}'
     windows_storage_disk_layout:
       - type: SATA
         adapter: 0
