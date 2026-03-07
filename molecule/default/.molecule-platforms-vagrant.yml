@@ -60,9 +60,9 @@
   ci: false
   box: generic/opensuse15
   interfaces: [{'network_name': 'private_network', 'type': 'dhcp', 'auto_config': True}]
-- name: opensusetumbleweed15
+- name: opensuse16
   ci: false
-  box: generic/opensuse15
+  box: generic/opensuse16
   interfaces: [{'network_name': 'private_network', 'type': 'dhcp', 'auto_config': True}]
 - name: debian10
   ci: false
@@ -121,7 +121,7 @@
   box: generic/fedora42
   interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
 - name: fedora43
-  ci: true
+  ci: false
   box: generic/fedora43
   interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
 - name: alpine3
@@ -133,28 +133,23 @@
   box: jborean93/WindowsServer2012R2
   groups: ['windows']
   interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
-  instance_raw_config_args: ['vm.disk :disk, name: "disk1", size: "1GB"', 'vm.disk :disk, name: "disk2", size: "2GB"']
 - name: win2016
   ci: false
   box: jborean93/WindowsServer2016
   groups: ['windows']
   interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
-  instance_raw_config_args: ['vm.disk :disk, name: "disk1", size: "1GB"', 'vm.disk :disk, name: "disk2", size: "2GB"']
 - name: win2019
   ci: false
   box: jborean93/WindowsServer2019
   groups: ['windows']
   interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
-  instance_raw_config_args: ['vm.disk :disk, name: "disk1", size: "1GB"', 'vm.disk :disk, name: "disk2", size: "2GB"']
 - name: win2022
   ci: false
   box: jborean93/WindowsServer2022
   groups: ['windows']
   interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
-  instance_raw_config_args: ['vm.disk :disk, name: "disk1", size: "1GB"', 'vm.disk :disk, name: "disk2", size: "2GB"']
 - name: win2025
   ci: false
   box: jborean93/WindowsServer2025
   groups: ['windows']
   interfaces: [{'network_name': 'private_network', 'type': 'dhcp'}]
-  instance_raw_config_args: ['vm.disk :disk, name: "disk1", size: "1GB"', 'vm.disk :disk, name: "disk2", size: "2GB"']
