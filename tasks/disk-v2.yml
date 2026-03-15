@@ -1,0 +1,88 @@
+---
+
+- name: Initialize Windows disk '{{ disk_number }}'
+  community.windows.win_initialize_disk:
+    disk_number: "{{ disk_number }}"
+    force: "{{ disk_force | default(False) }}"
+    style: "{{ disk_style | default('gpt') }}"
+
+- name: Convert partition sizes into bytes  # noqa jinja[spacing]
+  ansible.builtin.set_fact:
+    __disk_partitions: >-
+      [
+        {%- for part in disk_partitions -%}
+          {%- if part.partition_size | lower is search('gib$|g$') -%}
+            {%- set ps = part.partition_size|lower|regex_replace('gib$|g$')|trim|int * 1024 * 1024 * 1024 -%}
+          {%- elif part.partition_size | lower is search('mib$|m$') -%}
+            {%- set ps = part.partition_size|lower|regex_replace('mib$|m$')|trim|int * 1024 * 1024 -%}
+          {%- else -%}
+            {%- set ps = -1 -%}
+          {%- endif -%}
+          {{ part | combine({"partition_size": ps}) }},
+        {%- endfor -%}
+      ]
+
+- name: Cleanup undesired partitions for disk '{{ disk_number }}'
+  community.windows.win_partition:
+    disk_number: "{{ disk_number }}"
+    partition_number: "{{ part.partition_number }}"
+    state: absent
+  loop: "{{ disk_partitions | default([]) }}"
+  loop_control:
+    loop_var: part
+  when: (part.state | default('present')) == 'absent'
+
+- name: Distribute partion check script
+  ansible.windows.win_copy:
+    src: files/partion-check.ps1
+    dest: '{{ ansible_env.TEMP }}\partion-check.ps1'
+
+- name: Execute partion check script
+  ansible.windows.win_shell: >-
+    PowerShell.exe
+    -ExecutionPolicy Bypass
+    -File "$env:TEMP\partion-check.ps1"
+    -DiskNumber {{ disk_number }}
+    -PartitionNumber {{ part.partition_number }}
+    -DesiredSize {{ part.partition_size }}
+  register: partition_check
+  failed_when: partition_check.rc > 3
+  changed_when: false
+  loop: "{{ __disk_partitions }}"
+  loop_control:
+    loop_var: part
+
+- name: Create partitions on disk '{{ disk_number }}'  # noqa jinja[spacing]
+  community.windows.win_partition:
+    disk_number: "{{ disk_number }}"
+    drive_letter: "{{ part.part.drive_letter }}"
+    partition_number: "{{ part.part.partition_number | default(omit) }}"
+    partition_size: >-
+      {%- if part.part.partition_size | default(-1) == -1 -%}
+      -1
+      {%- else -%}
+      {{ part.part.partition_size }} B
+      {%- endif -%}
+    state: present
+  loop: "{{ partition_check.results }}"
+  loop_control:
+    loop_var: part
+    label: "{{ part.part }}"
+  when:
+    - (part.part.state | default('present')) == 'present'
+    - part.rc != 0
+
+- name: Format Windows disks '{{ disk_number }}'
+  community.windows.win_format:
+    allocation_unit_size: "{{ part.allocation_unit_size | default(omit) }}"
+    compress: "{{ part.compress | default(omit) }}"
+    drive_letter: "{{ part.drive_letter }}"
+    file_system: "{{ part.file_system | default('ntfs') }}"
+    force: "{{ part.force | default(omit) }}"
+    full: "{{ part.full | default(omit) }}"
+    large_frs: "{{ part.large_frs | default(omit) }}"
+    new_label: "{{ part.label | default(omit) }}"
+  loop: "{{ disk_partitions | default([]) }}"
+  loop_control:
+    loop_var: part
+  when: (part.state | default('present')) == 'present'

@@ -30,6 +30,7 @@ Supported platforms
 Note:
 <sup>1</sup> : no automated testing is performed on these platforms
 
+
 ## Role Variables
 ### defaults/main.yml
 <pre><code>
@@ -57,6 +58,7 @@ windows_storage_fields:
   hosts: all
   become: 'yes'
   vars:
+    molecule_driver: '{{ lookup(''env'', ''MOLECULE_DRIVER_NAME'') }}'
     windows_storage_disk_layout:
       - type: SATA
         adapter: 0
