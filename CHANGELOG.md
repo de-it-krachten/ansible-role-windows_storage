@@ -1,3 +1,16 @@
+# [1.5.0](https://github.com/de-it-krachten/ansible-role-windows_storage/compare/v1.4.0...v1.5.0) (2026-03-15)
+
+
+### Bug Fixes
+
+* Add partition check to prevent unnecessary actions ([0fc1a14](https://github.com/de-it-krachten/ansible-role-windows_storage/commit/0fc1a144483de6be01b32b0ccbbe084852267a31))
+
+
+### Features
+
+* Add support for Windows Server 2025 ([1824653](https://github.com/de-it-krachten/ansible-role-windows_storage/commit/1824653614f1600d74e65af18e68f80853e2c4e8))
+* Drop support for Fedora 43 ([780a720](https://github.com/de-it-krachten/ansible-role-windows_storage/commit/780a720a852034796f1f7260e3c060762fde5bc5))
+
 ## [1.5.1](https://github.com/de-it-krachten/ansible-role-windows_storage/compare/v1.5.0...v1.5.1) (2025-08-11)
 
 
