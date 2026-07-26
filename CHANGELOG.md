@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/de-it-krachten/ansible-role-windows_storage/compare/v1.5.0...v1.6.0) (2026-07-26)
+
+
+### Features
+
+* Add support for ansible-core 2.20+ ([9aa4985](https://github.com/de-it-krachten/ansible-role-windows_storage/commit/9aa49859c8fa00374e09396c6448250153fd21d0))
+
 # [1.5.0](https://github.com/de-it-krachten/ansible-role-windows_storage/compare/v1.4.0...v1.5.0) (2026-03-15)
 
 
