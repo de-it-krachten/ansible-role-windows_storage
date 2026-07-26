@@ -35,7 +35,7 @@
 - name: Distribute partion check script
   ansible.windows.win_copy:
     src: files/partion-check.ps1
-    dest: '{{ ansible_env.TEMP }}\partion-check.ps1'
+    dest: '{{ ansible_facts.env.TEMP }}\partion-check.ps1'
 
 - name: Execute partion check script
   ansible.windows.win_shell: >-
